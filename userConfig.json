@@ -1,0 +1,11 @@
+
+{
+  "customFontDirectory": "",
+  "fileName": "",
+
+  "appendDateToFileName": true,
+  "appendedDateWrittenOut" : true,
+  "appendedDateFormatting" : "dd-MM-yyyy",
+  "appendedDateGrammaCase" : "d"
+
+}
