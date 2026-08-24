@@ -81,7 +81,7 @@ public class DocumentRendererConfig {
      * @param settingsMap User provided map of settings from the project JSON file.
      */
     public void setUserConfig(HashMap<String, String> settingsMap) {
-        // Argument settingsMap contain a setting not listed above.
+        // Provided settingsMap contain a setting unlisted in defaults above.
         Set<String> KeySet = settingsMap.keySet();
         Set<String> unsupportedSettings = KeySet.stream()
                 .filter(Setting -> !defaultConfig.containsKey(Setting))
@@ -95,7 +95,7 @@ public class DocumentRendererConfig {
                 .filter(Setting -> isMissing(settingsMap.get(Setting), defaultConfig.get(Setting)))
                 .collect(Collectors.toSet());
 
-        // Supply default settings to the settingsMap local.
+        // Supply missing settings to the settingsMap local.
         missingSettings.forEach(setting -> {
             settingsMap.put(setting, defaultConfig.get(setting));
             Console.Warning("Missing setting in userConfig.json: '" + setting + "' Using defaults..");
