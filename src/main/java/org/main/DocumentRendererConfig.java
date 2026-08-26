@@ -65,7 +65,7 @@ public class DocumentRendererConfig {
         var settingsMap = this.settingsMap;
         String fileName = settingsMap.get("fileName");
 
-        if (JsonUtils.booleanizeString(settingsMap.get("appendDateToFileName"))) {
+        if (Boolean.parseBoolean(settingsMap.get("appendDateToFileName"))) {
             fileName = fileName + " " +
                     LocalDateString.create(new LocalDateOptions(
                             settingsMap.get("appendedDateFormatting"),
