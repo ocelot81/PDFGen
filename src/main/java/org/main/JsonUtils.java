@@ -26,12 +26,4 @@ public class JsonUtils {
             throw new RuntimeException("Failed to load data from " + fileName + ": " + e);
         }
     }
-
-    /**
-     * Parses a string into a boolean.
-     * @param string The string which will be parsed into a boolean
-     */
-    public static boolean booleanizeString(String string) {
-        return Boolean.parseBoolean(string);
-    }
 }
