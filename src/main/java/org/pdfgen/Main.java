@@ -7,8 +7,7 @@ import org.pdfgen.Renderring.DocumentRenderer;
 import org.pdfgen.Renderring.DocumentRendererConfig;
 import org.pdfgen.Utils.JsonUtils;
 import org.pdfgen.Utils.LocalDateOptions;
-import static org.pdfgen.Utils.LocalDateOptions.DATE_FORMAT_DAY_MONTH_YEAR;
-import static org.pdfgen.Utils.LocalDateOptions.DATE_FORMAT_MONTH_YEAR;
+import static org.pdfgen.Utils.LocalDateOptions.*;
 
 public class Main {
 
@@ -25,7 +24,7 @@ public class Main {
         renderer.setDatePreference("__Nagłówek__", new LocalDateOptions(DATE_FORMAT_DAY_MONTH_YEAR, "true", "d"));
         renderer.setDatePreference("Podstawa prawna", new LocalDateOptions(DATE_FORMAT_DAY_MONTH_YEAR, "false", "m"));
         renderer.setDatePreference("Tytułem", new LocalDateOptions(DATE_FORMAT_MONTH_YEAR, "true", "m"));
-        renderer.setDatePreference("Termin płatności", new LocalDateOptions(DATE_FORMAT_MONTH_YEAR, "true", "d"));
+        renderer.setDatePreference("Termin płatności", new LocalDateOptions(DATE_FORMAT_YEAR, "true", "d"));
 
         renderer.setLogStateToConsole(true);
         renderer.renderAll();

@@ -2,12 +2,12 @@
 {
   "customFontDirectoryPath": "",
   "attachSignature": true,
-  "fileName": "Placeholder_Name",
+  "fileName": "PDF Testing",
   "appendDateToFileName": true,
   "fontSize" : 17,
   "fontNameNormal" : "arial.ttf",
   "fontNameHeader" : "arialbd.ttf",
-  "languageLocale": "PL",
+  "languageLocale": "EN",
 
   "verticalPaddingBetweenFields" : 40,
   "appendedDateSpelledOut" : true,

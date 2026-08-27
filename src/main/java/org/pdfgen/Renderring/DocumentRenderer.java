@@ -142,6 +142,7 @@ public class DocumentRenderer {
         contentStream.setFont(this.fontHeader, this.fontSize);
         contentStream.showText(header);
         fieldShift = this.fontHeader.getStringWidth(header) / 1000 * this.fontSize;
+
         contentStream.newLineAtOffset(fieldShift, 0);
         contentStream.setFont(this.fontNormal, this.fontSize);
         contentStream.showText(body);

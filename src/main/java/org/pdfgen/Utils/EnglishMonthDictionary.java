@@ -24,10 +24,12 @@ public class EnglishMonthDictionary extends AbstractMonthDictionary {
 
     @Override
     protected String getLocaleFormatting(String formatting, int day, String month, int year) {
-        if (Objects.equals(formatting, LocalDateOptions.DATE_FORMAT_MONTH_YEAR)) {
-            return month + " " + year;
-        }
-        return month + " " + day + getOrdinal(day) + " " + year;
+        return switch (formatting) {
+            case LocalDateOptions.DATE_FORMAT_DAY_MONTH_YEAR -> month + " " + day + getOrdinal(day) + " " + year;
+            case LocalDateOptions.DATE_FORMAT_YEAR -> String.valueOf(year);
+
+            default -> month + " " + year;
+        };
     }
 
     private static String getOrdinal(int day) {
