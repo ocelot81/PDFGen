@@ -1,11 +1,14 @@
-package org.main;
+package org.pdfgen.Renderring;
 
 import lombok.Setter;
+import org.pdfgen.Facades.DateStringFacade;
+import org.pdfgen.Utils.LocalDateOptions;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.pdfgen.Utils.SettingsMapKeys;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -21,11 +24,14 @@ public class DocumentRenderer {
     private final String fileName;
     private final PDType0Font fontNormal;
     private final PDType0Font fontHeader;
+    private final int fontSize;
+    private final int OYPadding;
+    private final String languageLocale;
 
     @Setter private boolean logStateToConsole = false;
     @Setter private LinkedHashMap<String, Object> symbolReaderMap;
 
-    private final Map<String, LocalDateOptions> datePreference = new HashMap<>() {};
+    private final HashMap<String, LocalDateOptions> datePreference = new HashMap<>() {};
 
     /**
      * Sets the preference of formatting of specific fields.
@@ -50,6 +56,9 @@ public class DocumentRenderer {
             this.fileName = config.fileName;
             this.fontHeader = config.getFontByDocument(this.document, config.fontNameHeader);
             this.fontNormal = config.getFontByDocument(this.document, config.fontNameNormal);
+            this.fontSize = Integer.parseInt(config.getProperty(SettingsMapKeys.fontSize));
+            this.OYPadding = Integer.parseInt(config.getProperty(SettingsMapKeys.fieldYPadding));
+            this.languageLocale = config.getProperty("languageLocale");
         } catch (IOException e) {
             throw new RuntimeException("Exception during stream creation/font import: " + e);
         }
@@ -66,46 +75,42 @@ public class DocumentRenderer {
         Instant startingTime = Instant.now();
 
         float fieldShift = 0;
-        PDPageContentStream contentStream = this.contentStream;
-
-        contentStream.beginText();
-        contentStream.newLineAtOffset(50, 750);
-
-        Map<String, LocalDateOptions> datePreference = this.datePreference;
+        this.contentStream.beginText();
+        this.contentStream.newLineAtOffset(50, 750);
 
         for (Map.Entry<String, Object> fieldKv : this.symbolReaderMap.entrySet()) {
             String header = fieldKv.getKey();
             String body = fieldKv.getValue().toString();
 
-            if (datePreference.containsKey(header)) {
-                body = String.format(body, LocalDateString.create(datePreference.get(header)));
+            if (this.datePreference.containsKey(header)) {
+                body = String.format(body, DateStringFacade.create(datePreference.get(header), this.languageLocale));
             }
 
             if (header.startsWith("__") && header.endsWith("__")) {
-                fieldShift = this.renderField(contentStream, body, "", fieldShift);
-                contentStream.newLineAtOffset(0, -5);
+                fieldShift = renderField(this.contentStream, body, "", fieldShift);
+                this.contentStream.newLineAtOffset(0, -5);
                 continue;
             }
-            fieldShift = this.renderField(contentStream, header + ": ", body, fieldShift);
+            fieldShift = renderField(this.contentStream, header + ": ", body, fieldShift);
         }
 
-        contentStream.endText();
-        contentStream.close();
+        this.contentStream.endText();
+        this.contentStream.close();
 
         if (this.logStateToConsole) {
-            System.out.println("Successfully closed stream. Took: " + Duration.between(startingTime, Instant.now()).toMillis() + "ms");
+            System.out.printf("Successfully closed stream. Took: %s ms. %n", Duration.between(startingTime,Instant.now()).toMillis());
         }
     }
 
     /**
      * Saves the closed content stream to a PDF file
      *
-     * @apiNote Console notice may be toggled with DocumentRenderer.setLogStateToConsole(true);
+     * @apiNote Log may be toggled with DocumentRenderer.setLogStateToConsole(true);
      * @throws IOException thrown IOException that occured during the stream reading/writing.
      */
     public void saveFile() throws IOException {
         this.document.save(this.fileName);
-        if (this.logStateToConsole) { System.out.println("Successfully saved file '" + this.fileName + "'!"); }
+        if (this.logStateToConsole) { System.out.printf("Successfully saved file '%s'! %n", this.fileName); }
     }
 
     /**
@@ -123,23 +128,22 @@ public class DocumentRenderer {
         this.document = document;
         this.contentStream = contentStream;
     }
-
     /**
      * Writes a (header: body) field onto the page.
      *
      * @param contentStream the content stream.
-     * @param header Distinct header part of the field, using its setfont.
+     * @param header Distinct header part of the field, using its distinct font.
      * @param body Body of the field, using its set font.
      * @param fieldShift Current X-Axis shift to the right on the page during writing.
      * @throws IOException thrown IOException that occured during the stream reading/writing.
      */
     private float renderField(PDPageContentStream contentStream, String header, String body, float fieldShift) throws IOException {
-        contentStream.newLineAtOffset(-fieldShift, -35);
-        contentStream.setFont(this.fontHeader, 13);
+        contentStream.newLineAtOffset(-fieldShift, -this.OYPadding);
+        contentStream.setFont(this.fontHeader, this.fontSize);
         contentStream.showText(header);
-        fieldShift = this.fontHeader.getStringWidth(header) / 1000 * 13;
+        fieldShift = this.fontHeader.getStringWidth(header) / 1000 * this.fontSize;
         contentStream.newLineAtOffset(fieldShift, 0);
-        contentStream.setFont(this.fontNormal, 13);
+        contentStream.setFont(this.fontNormal, this.fontSize);
         contentStream.showText(body);
         return fieldShift;
     }

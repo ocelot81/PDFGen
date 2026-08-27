@@ -1,0 +1,18 @@
+
+{
+  "customFontDirectoryPath": "",
+  "attachSignature": true,
+  "fileName": "Placeholder_Name",
+  "appendDateToFileName": true,
+  "fontSize" : 17,
+  "fontNameNormal" : "arial.ttf",
+  "fontNameHeader" : "arialbd.ttf",
+  "languageLocale": "PL",
+
+  "verticalPaddingBetweenFields" : 40,
+  "appendedDateSpelledOut" : true,
+  "appendedDateFormatting" : "dd-MM-yyyy",
+  "appendedDateGrammaCase" : "d"
+
+
+}
