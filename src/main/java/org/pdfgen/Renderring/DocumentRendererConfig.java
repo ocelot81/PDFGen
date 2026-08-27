@@ -141,7 +141,7 @@ public class DocumentRendererConfig {
     }
 
     /**
-     * Checks whether the path is absolute (starts with root/drive)
+     * Fetches a setting in the internal settingsMap
      *
      * @param setting key representing the setting of the configuration
      * @throws NullPointerException key cannot be found in the settingsMap
