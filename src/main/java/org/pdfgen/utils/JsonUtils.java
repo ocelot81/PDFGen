@@ -1,4 +1,4 @@
-package org.pdfgen.Utils;
+package org.pdfgen.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

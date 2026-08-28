@@ -1,5 +1,5 @@
 
-package org.pdfgen.Utils;
+package org.pdfgen.utils;
 
 import java.util.Objects;
 

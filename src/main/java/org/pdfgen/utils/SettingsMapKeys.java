@@ -1,4 +1,4 @@
-package org.pdfgen.Utils;
+package org.pdfgen.utils;
 
 public interface SettingsMapKeys {
     String appendDateToFilename = "appendDateToFileName";
@@ -12,6 +12,6 @@ public interface SettingsMapKeys {
     String dateGrammaCase = "appendedDateGrammaCase";
     String languageLocale = "languageLocale";
     String customFontDirectory = "customFontDirectoryPath";
+    String outputSaveDirectory = "outputSaveDirectoryPath";
     String attachSignature = "attachSignature";
-
 }

@@ -1,15 +1,15 @@
-package org.pdfgen.Renderring;
+package org.pdfgen.renderring;
 
 import lombok.Setter;
-import org.pdfgen.Facades.DateStringFacade;
-import org.pdfgen.Utils.LocalDateOptions;
+import org.pdfgen.factory.DateStringFactory;
+import org.pdfgen.utils.LocalDateOptions;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.pdfgen.Utils.SettingsMapKeys;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,13 +21,11 @@ public class DocumentRenderer {
 
     private PDPageContentStream contentStream;
     private PDDocument document;
-    private final String fileName;
     private final PDType0Font fontNormal;
     private final PDType0Font fontHeader;
+    private final DocumentRendererConfig config;
     private final int fontSize;
-    private final int OYPadding;
-    private final String languageLocale;
-
+    private final int fieldYPadding;
     @Setter private boolean logStateToConsole = false;
     @Setter private LinkedHashMap<String, Object> symbolReaderMap;
 
@@ -47,18 +45,17 @@ public class DocumentRenderer {
     /**
      * Constructor of the class. Creates the required byte stream objects & initializes fonts and fileName via config.
      *
-     * @param config user provided renderer and file configuration
+     * @param userSettings user provided renderer and file configuration
      * @throws RuntimeException represents thrown IOExceptions that occured during renderring/IO operations.
      */
-    public DocumentRenderer(DocumentRendererConfig config) {
+    public DocumentRenderer(DocumentRendererConfig userSettings) {
         try {
             createContentStreamAndPage();
-            this.fileName = config.fileName;
-            this.fontHeader = config.getFontByDocument(this.document, config.fontNameHeader);
-            this.fontNormal = config.getFontByDocument(this.document, config.fontNameNormal);
-            this.fontSize = Integer.parseInt(config.getProperty(SettingsMapKeys.fontSize));
-            this.OYPadding = Integer.parseInt(config.getProperty(SettingsMapKeys.fieldYPadding));
-            this.languageLocale = config.getProperty("languageLocale");
+            this.fontHeader = userSettings.getFontByDocument(this.document, userSettings.fontNameHeader);
+            this.fontNormal = userSettings.getFontByDocument(this.document, userSettings.fontNameNormal);
+            this.fontSize = Integer.parseInt(userSettings.fontSize);
+            this.fieldYPadding = Integer.parseInt(userSettings.fieldYPadding);
+            this.config = userSettings;
         } catch (IOException e) {
             throw new RuntimeException("Exception during stream creation/font import: " + e);
         }
@@ -83,7 +80,8 @@ public class DocumentRenderer {
             String body = fieldKv.getValue().toString();
 
             if (this.datePreference.containsKey(header)) {
-                body = String.format(body, DateStringFacade.create(datePreference.get(header), this.languageLocale));
+                String dateToAdd = DateStringFactory.create(datePreference.get(header), config.languageLocale);
+                body = String.format(body, dateToAdd);
             }
 
             if (header.startsWith("__") && header.endsWith("__")) {
@@ -109,8 +107,8 @@ public class DocumentRenderer {
      * @throws IOException thrown IOException that occured during the stream reading/writing.
      */
     public void saveFile() throws IOException {
-        this.document.save(this.fileName);
-        if (this.logStateToConsole) { System.out.printf("Successfully saved file '%s'! %n", this.fileName); }
+        this.document.save(config.outputDirectory + File.separator + config.fileName);
+        if (this.logStateToConsole) { System.out.printf("Successfully saved file '%s'! %n", config.fileName); }
     }
 
     /**
@@ -138,11 +136,10 @@ public class DocumentRenderer {
      * @throws IOException thrown IOException that occured during the stream reading/writing.
      */
     private float renderField(PDPageContentStream contentStream, String header, String body, float fieldShift) throws IOException {
-        contentStream.newLineAtOffset(-fieldShift, -this.OYPadding);
-        contentStream.setFont(this.fontHeader, this.fontSize);
+        contentStream.newLineAtOffset(-fieldShift, -this.fieldYPadding);
+        contentStream.setFont(this.fontHeader, fontSize);
         contentStream.showText(header);
         fieldShift = this.fontHeader.getStringWidth(header) / 1000 * this.fontSize;
-
         contentStream.newLineAtOffset(fieldShift, 0);
         contentStream.setFont(this.fontNormal, this.fontSize);
         contentStream.showText(body);

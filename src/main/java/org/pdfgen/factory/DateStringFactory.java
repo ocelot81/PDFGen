@@ -1,15 +1,17 @@
-package org.pdfgen.Facades;
 
-import org.pdfgen.Utils.EnglishMonthDictionary;
-import org.pdfgen.Utils.LocalDateOptions;
-import org.pdfgen.Utils.PolishMonthDictionary;
+package org.pdfgen.factory;
 
+import org.pdfgen.utils.EnglishMonthDictionary;
+import org.pdfgen.utils.LocalDateOptions;
+import org.pdfgen.utils.PolishMonthDictionary;
 import java.util.Objects;
 
-public class DateStringFacade {
+public class DateStringFactory {
 
     public static String create(LocalDateOptions dateConfig, String locale) {
         String result = "";
+
+        locale = locale.toUpperCase();
 
         if (Objects.equals(locale, "PL")) {
             PolishMonthDictionary pmd = new PolishMonthDictionary();

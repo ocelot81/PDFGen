@@ -1,4 +1,4 @@
-package org.pdfgen.Utils;
+package org.pdfgen.utils;
 
 import lombok.AllArgsConstructor;
 

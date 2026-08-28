@@ -1,10 +1,8 @@
-package org.pdfgen.Signature;
+package org.pdfgen.signature;
 
 import lombok.Setter;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.ExternalSigningSupport;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.InputStream;

@@ -2,11 +2,11 @@
 
 {
   "__Nagłówek__" : "Today is %s",
-  "Wystawca": "Placeholder",
-  "Odbiorca": "Placeholder",
-  "Tytułem": "Test %s",
-  "Kwota": "Placeholder",
-  "Termin płatności": "testing %s",
+  "test1": "Placeholder",
+  "test2": "Placeholder",
+  "Testing 1": "%s",
+  "Testing 2": "Month: %s",
+  "Testing 3": "Year is %s",
 
-  "Podstawa prawna": "Placeholder"
+  "c": "Placeholder"
 }

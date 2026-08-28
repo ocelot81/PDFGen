@@ -1,10 +1,11 @@
-package org.pdfgen.Renderring;
+package org.pdfgen.renderring;
 
-import org.pdfgen.Facades.DateStringFacade;
-import org.pdfgen.Utils.*;
+import org.pdfgen.utils.*;
+import org.pdfgen.factory.DateStringFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -16,25 +17,34 @@ public class DocumentRendererConfig {
     public String fileName;
     public String fontNameNormal;
     public String fontNameHeader;
-    private final String defaultFontDirectory = "defaultFonts";
+    public String fontSize;
+    public String fieldYPadding;
+    public String languageLocale;
 
-    private String activeFontDirectory = defaultFontDirectory;
+    protected final String defaultFontDirectory = "defaultFonts";
+    protected String fontDirectory = defaultFontDirectory;
+    protected String outputDirectory;
+
     private Map<String, String> settingsMap;
 
-    private static final Map<String, String> defaultConfig = new HashMap<>() {{
-        put(SettingsMapKeys.fileName, "Unnamed file");
-        put(SettingsMapKeys.customFontDirectory, "");
-        put(SettingsMapKeys.fontSize, "14");
-        put(SettingsMapKeys.fontNameNormal, "arial.ttf");
-        put(SettingsMapKeys.fontNameHeader, "arialbd.ttf");
-        put(SettingsMapKeys.fieldYPadding, "35");
-        put(SettingsMapKeys.attachSignature, "false");
-        put(SettingsMapKeys.appendDateToFilename, "true");
-        put(SettingsMapKeys.dateFormatting, "MM-yyyy");
-        put(SettingsMapKeys.dateSpelledOut, "false");
-        put(SettingsMapKeys.dateGrammaCase, "m");
-        put(SettingsMapKeys.languageLocale, "PL");
-    }};
+    private static final Map<String, String> defaultConfig = Map.ofEntries(
+            Map.entry(SettingsMapKeys.fontSize, "14"),
+            Map.entry(SettingsMapKeys.fontNameNormal, "arial.ttf"),
+            Map.entry(SettingsMapKeys.fontNameHeader, "arialbd.ttf"),
+            Map.entry(SettingsMapKeys.fieldYPadding, "35"),
+            Map.entry(SettingsMapKeys.attachSignature, "false"),
+            Map.entry(SettingsMapKeys.appendDateToFilename, "true"),
+            Map.entry(SettingsMapKeys.dateFormatting, "MM-yyyy"),
+            Map.entry(SettingsMapKeys.dateSpelledOut, "false"),
+            Map.entry(SettingsMapKeys.dateGrammaCase, "m"),
+            Map.entry(SettingsMapKeys.languageLocale, "PL"),
+            Map.entry(SettingsMapKeys.fileName, "Unnamed file"),
+            Map.entry(SettingsMapKeys.customFontDirectory, ""),
+
+            Map.entry(SettingsMapKeys.outputSaveDirectory,
+                    FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath()
+            )
+    );
 
     /**
      * Supplements the name of the .ttf file queried to the default/custom directory
@@ -52,18 +62,33 @@ public class DocumentRendererConfig {
      *
      * @throws IllegalStateException Font directory unreachable (default 'defaultFonts' and user provided one)
      */
-    private void setActiveFontDirectory() {
+    private void setFontDirectory() {
         String customFontDirectory = this.settingsMap.get(SettingsMapKeys.customFontDirectory);
 
         if (!customFontDirectory.isBlank()) {
-            if (!isAbsolutePath(customFontDirectory)) {
-                System.out.printf("Path '%s' isnt absolute! Using defaults... %n", customFontDirectory);
+            if (isNotAbsolutePath(customFontDirectory)) {
+                System.out.printf("Path '%s' isnt absolute! Using default fonts... %n", customFontDirectory);
                 return;
             }
-            this.activeFontDirectory = customFontDirectory;
+            this.fontDirectory = customFontDirectory;
         } else if (!Files.exists(Paths.get(defaultFontDirectory))) {
             throw new IllegalStateException(String.format("Default or custom font directory doesnt exist! Folder '%s' missing from project path?", defaultFontDirectory));
         }
+    }
+
+    /**
+     * Sets the directory to which the PDF is saved.
+     */
+    private void setOutputDirectory() {
+        String outputSaveDirectory = this.settingsMap.get(SettingsMapKeys.outputSaveDirectory);
+
+        if (isNotAbsolutePath(outputSaveDirectory)) {
+            System.out.printf("Path '%s' isnt absolute! Using default... (Desktop) %n", outputSaveDirectory);
+            this.outputDirectory = defaultConfig.get(SettingsMapKeys.outputSaveDirectory);
+            return;
+        }
+
+        this.outputDirectory = outputSaveDirectory;
     }
     /**
      * Creates the file name per provided settings file
@@ -79,10 +104,9 @@ public class DocumentRendererConfig {
                     settingsMap.get(SettingsMapKeys.dateSpelledOut),
                     settingsMap.get(SettingsMapKeys.dateGrammaCase)
             );
+            String appendedDate = DateStringFactory.create(dateConfig, this.getProperty(SettingsMapKeys.languageLocale));
 
-            String appendedDate = DateStringFacade.create(dateConfig, this.getProperty(SettingsMapKeys.languageLocale));
-
-            fileName = fileName + " "+ appendedDate;
+            fileName = fileName + " " + appendedDate;
         }
 
         this.fileName = fileName + ".pdf";
@@ -115,9 +139,18 @@ public class DocumentRendererConfig {
         });
 
         this.settingsMap = settingsMap;
-        this.useFontOfName(settingsMap.get(SettingsMapKeys.fontNameHeader), settingsMap.get(SettingsMapKeys.fontNameNormal));
+        this.useFontOfName(
+                settingsMap.get(SettingsMapKeys.fontNameHeader),
+                settingsMap.get(SettingsMapKeys.fontNameNormal)
+        );
+
+        this.fontSize = settingsMap.get(SettingsMapKeys.fontSize);
+        this.fieldYPadding = settingsMap.get(SettingsMapKeys.fieldYPadding);
+        this.languageLocale = settingsMap.get(SettingsMapKeys.languageLocale);
+
         this.setFileName();
-        this.setActiveFontDirectory();
+        this.setFontDirectory();
+        this.setOutputDirectory();
     }
 
     /**
@@ -136,8 +169,8 @@ public class DocumentRendererConfig {
      * @param userProvidedPath Path provided by the user
      * @throws InvalidPathException String cannot be converted to class Path
      */
-    private boolean isAbsolutePath(String userProvidedPath) throws InvalidPathException {
-        return Paths.get(userProvidedPath).isAbsolute();
+    private boolean isNotAbsolutePath(String userProvidedPath) throws InvalidPathException {
+        return !Paths.get(userProvidedPath).isAbsolute();
     }
 
     /**
@@ -159,13 +192,13 @@ public class DocumentRendererConfig {
      * @throws IllegalStateException file unreachable/empty in size
      */
     public PDType0Font getFontByDocument(PDDocument document, String fontFileName) throws IOException {
-        String activeFontDirectory = this.activeFontDirectory;
-        Path activePath = Paths.get(activeFontDirectory + "/" + fontFileName);
+        String fontDirectory = this.fontDirectory;
+        Path activePath = Paths.get(fontDirectory + File.separator + fontFileName);
 
         if (!Files.exists(activePath) || Files.size(activePath) == 0) {
-            throw new IllegalStateException(String.format("File '%s' doesnt exist in directory '%s' or the file is empty.", fontFileName, activeFontDirectory));
+            throw new IllegalStateException(String.format("File '%s' doesnt exist in directory '%s' or the file is empty.", fontFileName, fontDirectory));
         }
 
-        return PDType0Font.load(document, new File(activeFontDirectory + "/" + fontFileName));
+        return PDType0Font.load(document, new File(fontDirectory + File.separator + fontFileName));
     }
 }

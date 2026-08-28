@@ -1,6 +1,7 @@
 
 {
   "customFontDirectoryPath": "",
+  "outputSaveDirectoryPath" : "",
   "attachSignature": true,
   "fileName": "PDF Testing",
   "appendDateToFileName": true,
