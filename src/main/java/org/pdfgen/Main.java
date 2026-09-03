@@ -1,10 +1,11 @@
-
 package org.pdfgen;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.pdfgen.renderring.DocumentRenderer;
 import org.pdfgen.renderring.DocumentRendererConfig;
+import org.pdfgen.signature.DigitalSigner;
 import org.pdfgen.utils.JsonUtils;
 import org.pdfgen.utils.LocalDateOptions;
 import static org.pdfgen.utils.LocalDateOptions.*;
@@ -29,6 +30,10 @@ public class Main {
         renderer.setLogStateToConsole(true);
         renderer.renderAll();
         renderer.saveFile();
+
+        DigitalSigner signer = new DigitalSigner(config.fullSavePath, "path", "mykey");
+
+        signer.addSignatureToDocument();
 
     }
 }

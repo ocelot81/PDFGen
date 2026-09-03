@@ -1,5 +1,6 @@
 package org.pdfgen.renderring;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.pdfgen.factory.DateStringFactory;
 import org.pdfgen.utils.LocalDateOptions;
@@ -9,7 +10,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
@@ -20,7 +20,6 @@ import java.util.Map;
 public class DocumentRenderer {
 
     private PDPageContentStream contentStream;
-    private PDDocument document;
     private final PDType0Font fontNormal;
     private final PDType0Font fontHeader;
     private final DocumentRendererConfig config;
@@ -28,6 +27,7 @@ public class DocumentRenderer {
     private final int fieldYPadding;
     @Setter private boolean logStateToConsole = false;
     @Setter private LinkedHashMap<String, Object> symbolReaderMap;
+    @Getter private PDDocument document;
 
     private final HashMap<String, LocalDateOptions> datePreference = new HashMap<>() {};
 
@@ -107,7 +107,7 @@ public class DocumentRenderer {
      * @throws IOException thrown IOException that occured during the stream reading/writing.
      */
     public void saveFile() throws IOException {
-        this.document.save(config.outputDirectory + File.separator + config.fileName);
+        this.document.save(config.fullSavePath);
         if (this.logStateToConsole) { System.out.printf("Successfully saved file '%s'! %n", config.fileName); }
     }
 

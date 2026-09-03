@@ -21,9 +21,10 @@ public class DocumentRendererConfig {
     public String fieldYPadding;
     public String languageLocale;
 
-    protected final String defaultFontDirectory = "defaultFonts";
-    protected String fontDirectory = defaultFontDirectory;
-    protected String outputDirectory;
+    public final String defaultFontDirectory = "defaultFonts";
+    public String fontDirectory = defaultFontDirectory;
+    public String outputDirectory;
+    public String fullSavePath;
 
     private Map<String, String> settingsMap;
 
@@ -151,6 +152,7 @@ public class DocumentRendererConfig {
         this.setFileName();
         this.setFontDirectory();
         this.setOutputDirectory();
+        this.fullSavePath = outputDirectory + File.separator + fileName;
     }
 
     /**

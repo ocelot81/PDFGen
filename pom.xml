@@ -7,6 +7,7 @@
     <properties>
         <pdfbox.version>3.0.8</pdfbox.version>
         <bouncycastle.version>1.85.2</bouncycastle.version>
+        <bouncycastleExtra.version>1.85</bouncycastleExtra.version>
         <jackson.version>2.22.1</jackson.version>
         <lombok.version>1.18.46</lombok.version>
         <java.version>25</java.version>
@@ -30,6 +31,20 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <version>${bouncycastle.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcmail-jdk18on</artifactId>
+            <version>${bouncycastleExtra.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncycastleExtra.version}</version>
             <scope>compile</scope>
         </dependency>
 
